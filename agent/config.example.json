@@ -1,0 +1,9 @@
+{
+  "server": "http://127.0.0.1:8000/",
+  "token": "COPIAR_PRINT_AGENT_TOKEN_DESDE_ENV",
+  "printers": {
+    "1": { "type": "tcp", "host": "192.168.1.201", "port": 9100 },
+    "2": { "type": "tcp", "host": "192.168.1.202", "port": 9100 },
+    "3": { "type": "device", "path": "\\\\localhost\\TicketCaja" }
+  }
+}

@@ -1,0 +1,436 @@
+[
+  {
+    "name": "Charola de carnes — 4 personas",
+    "price": 500,
+    "category": "Charolas",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "Contiene: Carne asada, Chorizo, Longaniza, Butifarra, Salchichas enchipotladas, Costillas, Salpicón, Chiles rellenos de carne, Ensalada rusa, Plátanos fritos. Incluye: pico de gallo, frijoles refritos, plátanos fritos, tostadas y salsa de la casa.",
+    "options": []
+  },
+  {
+    "name": "Charola de carnes — 8 personas",
+    "price": 1000,
+    "category": "Charolas",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "Contiene: Carne asada, Chorizo, Longaniza, Butifarra, Salchichas enchipotladas, Costillas, Salpicón, Chiles rellenos de carne, Ensalada rusa, Plátanos fritos. Incluye: pico de gallo, frijoles refritos, plátanos fritos, tostadas y salsa de la casa.",
+    "options": []
+  },
+  {
+    "name": "Charola La Comiteca — 4 personas",
+    "price": 500,
+    "category": "Charolas",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "Contiene: Queso de puerco, Patitas de puerco con pickles, Lomo relleno, Carne rosada, Butifarra, Tinga, Quesillo, Carne tártara, Bolitas de plátano. Incluye: pico de gallo, frijoles refritos, plátanos fritos, tostadas y salsa de la casa.",
+    "options": []
+  },
+  {
+    "name": "Charola La Comiteca — 8 personas",
+    "price": 1000,
+    "category": "Charolas",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "Contiene: Queso de puerco, Patitas de puerco con pickles, Lomo relleno, Carne rosada, Butifarra, Tinga, Quesillo, Carne tártara, Bolitas de plátano. Incluye: pico de gallo, frijoles refritos, plátanos fritos, tostadas y salsa de la casa.",
+    "options": []
+  },
+  {
+    "name": "Charola mixta — 4 personas",
+    "price": 650,
+    "category": "Charolas",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "Contiene: Aguachile, Filete de pescado, Camarones al ajillo, Macabil, Carne asada, Butifarra, Costillas, Chiles rellenos.",
+    "options": []
+  },
+  {
+    "name": "Charola mixta — 8 personas",
+    "price": 1300,
+    "category": "Charolas",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "Contiene: Aguachile, Filete de pescado, Camarones al ajillo, Macabil, Carne asada, Butifarra, Costillas, Chiles rellenos.",
+    "options": []
+  },
+  {
+    "name": "Charola de mariscos — 4 personas",
+    "price": 750,
+    "category": "Charolas",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "Contiene: Macabil, Ensalada de camarón, Camarones al ajillo, Filete de pescado empanizado, Camarones empanizados, Chiles rellenos de minilla, Rollos de minilla, Aguachile. Incluye: aderezo, frijoles con camarón, tostadas y salsa de la casa.",
+    "options": []
+  },
+  {
+    "name": "Charola de mariscos — 8 personas",
+    "price": 1500,
+    "category": "Charolas",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "Contiene: Macabil, Ensalada de camarón, Camarones al ajillo, Filete de pescado empanizado, Camarones empanizados, Chiles rellenos de minilla, Rollos de minilla, Aguachile. Incluye: aderezo, frijoles con camarón, tostadas y salsa de la casa.",
+    "options": []
+  },
+  {
+    "name": "Plato de carnes — 2 personas",
+    "price": 250,
+    "category": "Platos",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "Contiene: Chiles rellenos de carne, Carne asada, Butifarra, Ensalada rusa, Costillas. Incluye: pico de gallo, frijoles refritos, plátanos fritos, tostadas y salsa de la casa.",
+    "options": []
+  },
+  {
+    "name": "Plato La Comiteca — 2 personas",
+    "price": 250,
+    "category": "Platos",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "Contiene: Lomo relleno, Quesillo, Carne rosada, Carne tártara, Butifarra. Incluye: pico de gallo, frijoles refritos, plátanos fritos, tostadas y salsa de la casa.",
+    "options": []
+  },
+  {
+    "name": "Plato mixto — 2 personas",
+    "price": 300,
+    "category": "Platos",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "Contiene: Chiles rellenos de minilla, Butifarra, Camarones al ajillo, Filete de pescado.",
+    "options": []
+  },
+  {
+    "name": "Plato de mariscos — 2 personas",
+    "price": 350,
+    "category": "Platos",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "Contiene: Chiles rellenos de minilla, Camarones al ajillo, Camarones empanizados, Macabil, Ensalada de camarón. Incluye: aderezo, frijoles con camarón, tostadas y salsa de la casa.",
+    "options": []
+  },
+  {
+    "name": "Charola especial — 6 personas",
+    "price": 800,
+    "category": "Especiales",
+    "type": "compuesto",
+    "max_choices": 12,
+    "description": "12 botanas a elegir. No aplica mariscos.",
+    "options": [
+      "Carne asada",
+      "Chorizo",
+      "Longaniza",
+      "Butifarra",
+      "Salchichas enchipotladas",
+      "Costillas",
+      "Salpicón",
+      "Chiles rellenos de carne",
+      "Ensalada rusa",
+      "Plátanos fritos",
+      "Queso de puerco",
+      "Patitas de puerco con pickles",
+      "Lomo relleno",
+      "Carne rosada",
+      "Tinga",
+      "Quesillo",
+      "Carne tártara",
+      "Bolitas de plátano"
+    ]
+  },
+  {
+    "name": "Charola especial — 12 personas",
+    "price": 1600,
+    "category": "Especiales",
+    "type": "compuesto",
+    "max_choices": 12,
+    "description": "12 botanas a elegir. No aplica mariscos.",
+    "options": [
+      "Carne asada",
+      "Chorizo",
+      "Longaniza",
+      "Butifarra",
+      "Salchichas enchipotladas",
+      "Costillas",
+      "Salpicón",
+      "Chiles rellenos de carne",
+      "Ensalada rusa",
+      "Plátanos fritos",
+      "Queso de puerco",
+      "Patitas de puerco con pickles",
+      "Lomo relleno",
+      "Carne rosada",
+      "Tinga",
+      "Quesillo",
+      "Carne tártara",
+      "Bolitas de plátano"
+    ]
+  },
+  {
+    "name": "Orden extra — Camarones al ajillo",
+    "price": 150,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Camarones empanizados",
+    "price": 150,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Macabil",
+    "price": 130,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Aguachile",
+    "price": 130,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Ensalada de camarón",
+    "price": 130,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Filete de pescado empanizado",
+    "price": 130,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Chiles rellenos de minilla",
+    "price": 130,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Rollos de minilla",
+    "price": 130,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Chiles rellenos de carne",
+    "price": 130,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Carne asada",
+    "price": 120,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Butifarra",
+    "price": 120,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Costillas",
+    "price": 120,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Salpicón",
+    "price": 120,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Lomo relleno",
+    "price": 120,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Tinga",
+    "price": 120,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Chorizo",
+    "price": 100,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Longaniza",
+    "price": 100,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Queso de puerco",
+    "price": 100,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Carne rosada",
+    "price": 100,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Carne tártara",
+    "price": 100,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Ensalada rusa",
+    "price": 80,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Salchichas enchipotladas",
+    "price": 80,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Patitas de puerco con pickles",
+    "price": 80,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Quesillo",
+    "price": 80,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Frijoles con camarón",
+    "price": 80,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Pico de gallo",
+    "price": 50,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Plátanos fritos",
+    "price": 50,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Frijoles refritos",
+    "price": 50,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Tostadas",
+    "price": 30,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  },
+  {
+    "name": "Orden extra — Salsa",
+    "price": 25,
+    "category": "Órdenes extra",
+    "type": "simple",
+    "max_choices": 0,
+    "description": "",
+    "options": []
+  }
+]
