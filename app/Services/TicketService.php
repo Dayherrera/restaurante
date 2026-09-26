@@ -75,7 +75,7 @@ class TicketService
                     $lines = [...$lines, ...$this->columns($item->quantity.' x '.$this->money($item->unit_price), $this->money($item->quantity * $item->unit_price))];
                 }
                 foreach ($item->selected_options ?? [] as $option) {
-                    $lines = [...$lines, ...$this->wrap('  '.(isset($option['group']) ? $option['group'].': ' : '').$option['quantity'].' x '.$option['name'])];
+                    $lines = [...$lines, ...$this->wrap('  '.(isset($option['group']) && strcasecmp(trim($option['group']), 'Botanas a elegir') !== 0 ? $option['group'].': ' : '').$option['quantity'].' x '.$option['name'])];
                 }
                 if ($item->kitchen_notes) {
                     $lines = [...$lines, ...$this->wrap('NOTA: '.$item->kitchen_notes)];

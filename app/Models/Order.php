@@ -10,6 +10,12 @@ class Order extends Model
 
     protected $casts = ['scheduled_date' => 'date', 'total' => 'decimal:2', 'amount_paid' => 'decimal:2', 'balance_due' => 'decimal:2'];
 
+    public function getOrderNumberAttribute($value): string
+    {
+        $value = (string) $value;
+        return ctype_digit($value) ? str_pad($value, 7, '0', STR_PAD_LEFT) : $value;
+    }
+
     public function items()
     {
         return $this->hasMany(OrderItem::class);

@@ -162,7 +162,7 @@ class OrderService
         $next = $sequence->value + 1;
         DB::table('order_sequences')->where('name', 'orders')->update(['value' => $next]);
 
-        return (string) $next;
+        return str_pad((string) $next, 7, '0', STR_PAD_LEFT);
     }
 
     public function previewCapacity(array $items, string $date, string $time, bool $override = false): void
