@@ -39,7 +39,7 @@ class RealMenuTest extends TestCase
         $this->get('/pos')->assertOk()->assertSee('Buscar cliente por nombre o teléfono')->assertDontSee('INDIVIDUAL');
     }
 
-    public function test_fixed_composition_is_saved_and_printed_from_snapshot(): void
+    public function test_fixed_composition_snapshot_is_preserved_but_omitted_from_tickets_and_dispatch(): void
     {
         putenv('POS_ADMIN_PASSWORD=Testing-Password-123');
         $this->seed();
@@ -49,10 +49,10 @@ class RealMenuTest extends TestCase
         $order = app(OrderService::class)->create(['request_key' => (string) Str::uuid(), 'customer_name' => 'Prueba', 'customer_phone' => '0000000000', 'delivery_type' => 'sucursal', 'delivery_cost' => 0, 'scheduled_date' => now()->addDay()->toDateString(), 'scheduled_time' => '14:00', 'items' => [['product_id' => $p->id, 'quantity' => 1, 'options' => []]], 'payments' => []]);
         $this->assertEquals(250, $order->total);
         $this->assertStringContainsString('Quesillo', $order->items->first()->product_description);
-        $this->assertStringContainsString('Quesillo', PrintJob::first()->payload);
+        $this->assertStringNotContainsString('Quesillo', PrintJob::first()->payload);
         $p->update(['description' => 'Descripción cambiada']);
         $this->assertStringContainsString('Quesillo', $order->items()->first()->product_description);
         $this->get('/pedidos/'.$order->id)->assertOk()->assertSee('Quesillo');
-        $this->get('/despacho')->assertOk()->assertSee('Quesillo');
+        $this->get('/despacho')->assertOk()->assertDontSee('Quesillo');
     }
 }

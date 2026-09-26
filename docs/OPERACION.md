@@ -50,3 +50,14 @@ Registra entradas/retiros con motivo. No se admite retirar más efectivo del dis
 El sistema registra trabajos aunque el agente esté apagado. El centro de impresión muestra pendiente, procesando, impreso o fallido. Un envío TCP exitoso significa que el transporte aceptó los bytes; no confirma que exista papel ni que el ticket saliera correctamente.
 
 Si falta confirmación por más de dos minutos, el siguiente sondeo del agente deja el trabajo en fallido para revisión manual. Antes de reintentar revisa si el ticket ya salió; evita duplicar comandas.
+
+
+## Tickets y folios (25/09/2026)
+
+Los pedidos nuevos usan un folio numérico consecutivo global, sin reinicio diario. Los folios antiguos se conservan para mantener las referencias de comprobantes ya entregados. La secuencia se asigna dentro de la transacción: un error no consume el número y reenviar la misma venta devuelve el mismo pedido. Cancelar un pedido no reutiliza su folio.
+
+Cocina, caja y el monitor de despacho muestran cantidad y nombre del producto, elecciones guardadas y notas de preparación. La descripción fija del menú no aparece en estas salidas; sigue conservada en el detalle del pedido.
+
+Caja utiliza un recibo de 32 columnas para papel de 58 mm: encabezado centrado, folio, entrega, precios por partida, total, pagos por método, reembolsos y saldo. Los movimientos parciales identifican expresamente que los totales corresponden al pedido completo. No se añaden cargos ni impuestos inventados.
+
+Los trabajos de impresión ya generados conservan su contenido original. Las nuevas comandas y reimpresiones usan el formato nuevo. Para aplicar en otra instalación existente: respaldar y ejecutar las migraciones; `scripts/apply-ticket-folios.php` automatiza respaldo y migración para restaurant_db.

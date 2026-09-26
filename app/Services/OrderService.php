@@ -135,7 +135,7 @@ class OrderService
                 $this->fail('El pago aplicado supera el total. Registra únicamente el importe cobrado, sin incluir el cambio.');
             }
             $order = Order::create(collect($data)->only(['customer_id', 'delivery_driver_id', 'request_key', 'customer_name', 'customer_phone', 'delivery_type', 'delivery_address', 'scheduled_date', 'scheduled_time'])->all() + [
-                'order_number' => 'MAG-'.strtoupper(substr(str_replace('-', '', $data['request_key']), 0, 16)), 'user_id' => auth()->id(), 'cash_shift_id' => $shift->id,
+                'order_number' => $this->nextFolio(), 'user_id' => auth()->id(), 'cash_shift_id' => $shift->id,
                 'delivery_cost' => self::money($data['delivery_type'] === 'domicilio' ? self::cents($data['delivery_cost']) : 0), 'total' => self::money($total), 'amount_paid' => self::money($paid), 'balance_due' => self::money($total - $paid), 'status' => 'pendiente',
             ]);
             $order->items()->createMany($rows);
@@ -149,6 +149,20 @@ class OrderService
 
             return $order;
         }, 3);
+    }
+
+    private function nextFolio(): string
+    {
+        // The row lock is held until the surrounding order transaction commits.
+        // A failed order rolls the sequence back; idempotent retries never reach this point.
+        $sequence = DB::table('order_sequences')->where('name', 'orders')->lockForUpdate()->first();
+        if (! $sequence) {
+            throw new \RuntimeException('Falta aplicar la migración de folios.');
+        }
+        $next = $sequence->value + 1;
+        DB::table('order_sequences')->where('name', 'orders')->update(['value' => $next]);
+
+        return (string) $next;
     }
 
     public function previewCapacity(array $items, string $date, string $time, bool $override = false): void
