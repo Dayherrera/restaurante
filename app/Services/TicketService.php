@@ -49,12 +49,22 @@ class TicketService
     {
         $order->load('items', 'payments');
         $items = $order->items->when($itemIds !== null, fn ($q) => $q->whereIn('id', $itemIds));
-        $areaIds = $items->pluck('print_area_id')->push(PrintArea::where('name', 'Caja')->value('id'))->filter()->unique();
+        $areaIds = ($kind === 'pago' || !$order->production_released_at ? collect() : $items->where('is_cancelled', false)->pluck('print_area_id')->merge($kind === 'cancelacion' ? $items->pluck('print_area_id') : []))->push(PrintArea::where('name', 'Caja')->value('id'))->filter()->unique();
+        if ($kind === 'liberacion') $areaIds = $areaIds->reject(fn($id)=>$id == PrintArea::where('name','Caja')->value('id'));
+        if ($kind === 'liberacion') $items = $items->where('is_cancelled', false);
         $rule = str_repeat('-', self::WIDTH);
+        $company = \App\Models\CompanySetting::current();
         foreach ($areaIds as $areaId) {
             $area = PrintArea::findOrFail($areaId);
             $cash = $area->name === 'Caja';
-            $lines = [...$this->center('CHAROLAS LOS MAGUEYES'), ...$this->center(strtoupper($kind).' / '.$area->name), $rule, ...$this->center('FOLIO: '.$order->order_number)];
+            $lines = $this->center($cash ? $company->business_name : 'CHAROLAS LOS MAGUEYES');
+            if ($cash) {
+                foreach (['legal_name'=>'','rfc'=>'RFC: ','address'=>'','phone'=>'Tel: ','email'=>'','website'=>''] as $field=>$prefix) {
+                    if (filled($company->$field)) $lines = [...$lines, ...$this->center($prefix.$company->$field)];
+                }
+            }
+            $lines = [...$lines, ...$this->center(strtoupper($kind).' / '.$area->name), $rule, ...$this->center('FOLIO: '.$order->order_number)];
+            if (!$cash && $order->scheduled_date->toDateString() > now()->toDateString()) $lines = [...$lines, ...$this->center('PREPARACION ANTICIPADA AUTORIZADA')];
             if ($cash) {
                 $lines = [...$lines, ...$this->wrap('Emitido: '.now()->format('d/m/Y H:i'))];
             }
@@ -94,7 +104,7 @@ class TicketService
                 foreach (DB::table('order_refunds')->where('order_id', $order->id)->get() as $r) {
                     $lines = [...$lines, ...$this->columns('Reembolso '.$r->payment_method, $this->money($r->amount))];
                 }
-                $lines = [...$lines, ...$this->columns('PAGADO NETO', $this->money($order->amount_paid)), ...$this->columns('SALDO PENDIENTE', $this->money($order->balance_due)), $rule, ...$this->center('Gracias por su preferencia'), ...$this->center('Conserve este comprobante')];
+                $lines = [...$lines, ...$this->columns('PAGADO NETO', $this->money($order->amount_paid)), ...$this->columns('SALDO PENDIENTE', $this->money($order->balance_due)), $rule, ...($company->ticket_footer ? $this->center($company->ticket_footer) : []), ...$this->center('Conserve este comprobante')];
             }
             PrintJob::create(['order_id' => $order->id, 'print_area_id' => $areaId, 'kind' => $kind, 'payload' => implode("\n",$lines)]);
         }

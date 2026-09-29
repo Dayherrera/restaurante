@@ -54,7 +54,7 @@ class PosWorkflowTest extends TestCase
         $this->assertEquals('240.00', $o->total);
         $this->assertEquals('120.00', $o->balance_due);
         $this->assertCount(2, $o->payments);
-        $this->assertEquals(2, PrintJob::count());
+        $this->assertEquals(1, PrintJob::count());
         $this->get('/pedidos/'.$o->id)->assertOk()->assertSee('Sin cebolla');
     }
 
@@ -157,6 +157,7 @@ class PosWorkflowTest extends TestCase
     {
         $o = app(OrderService::class)->create($this->data(['delivery_type' => 'domicilio', 'delivery_address' => 'Calle Uno 25', 'delivery_cost' => 50]));
         $service = app(OrderService::class);
+        $service->release($o->id, 'Preparación anticipada de prueba');
         $service->status($o->id, 'en_preparacion');
         $service->status($o->id, 'listo');
         try {
@@ -208,6 +209,7 @@ class PosWorkflowTest extends TestCase
     {
         config(['pos.print_token' => 'test-token']);
         $o = app(OrderService::class)->create($this->data());
+        app(OrderService::class)->release($o->id, 'Prueba de impresión autorizada');
         $this->postJson('/print-agent/claim', ['areas' => [1]])->assertUnauthorized();
         $response = $this->withToken('test-token')->postJson('/print-agent/claim', ['areas' => [1]])->assertOk();
         $job = $response->json('job');
@@ -221,7 +223,7 @@ class PosWorkflowTest extends TestCase
     public function test_livewire_add_remove_and_submit(): void
     {
         $p = Product::where('name', 'Refresco')->first();
-        Livewire::test(Pos::class)->set('customerForm.name', 'Cliente Livewire')->set('customerForm.phone', '5555555555')->call('saveCustomer')->set('dateInput', now()->addDay()->toDateString())->set('timeInput', '14:00')->call('confirmSchedule')->call('add', $p->id)->assertSet('items.0.product_id', $p->id)->set('payments.efectivo', 35)->call('save')->assertHasNoErrors()->assertRedirect();
+        Livewire::test(Pos::class)->set('customerForm.name', 'Cliente Livewire')->set('customerForm.phone', '5555555555')->call('saveCustomer')->set('dateInput', now()->addDay()->toDateString())->set('timeInput', '14:00')->set('delivery_type', 'sucursal')->call('confirmSchedule')->call('add', $p->id)->assertSet('items.0.product_id', $p->id)->set('payments.efectivo', 35)->call('save')->assertHasNoErrors()->assertRedirect();
         $this->assertDatabaseHas('orders', ['customer_name' => 'Cliente Livewire', 'total' => 35, 'balance_due' => 0]);
     }
 

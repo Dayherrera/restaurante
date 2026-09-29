@@ -33,7 +33,7 @@ class OrderUxTest extends TestCase
 
     private function pos()
     {
-        return Livewire::test(Pos::class)->set('customerForm.name', 'Cliente UX')->set('customerForm.phone', '9631234567')->call('saveCustomer')->assertHasNoErrors()->set('dateInput', now()->addDay()->toDateString())->set('timeInput', '14:00')->call('confirmSchedule')->assertHasNoErrors();
+        return Livewire::test(Pos::class)->set('customerForm.name', 'Cliente UX')->set('customerForm.phone', '9631234567')->call('saveCustomer')->assertHasNoErrors()->set('dateInput', now()->addDay()->toDateString())->set('timeInput', '14:00')->set('delivery_type', 'sucursal')->call('confirmSchedule')->assertHasNoErrors();
     }
 
     public function test_menu_conversion_preserves_prices_and_is_idempotent()

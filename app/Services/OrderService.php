@@ -280,11 +280,30 @@ class OrderService
         }, 3);
     }
 
+    public function release(int $id, ?string $reason = null): void
+    {
+        Gate::authorize('dispatch.manage');
+        DB::transaction(function () use ($id, $reason) {
+            $order = Order::lockForUpdate()->findOrFail($id);
+            if ($order->production_released_at) return;
+            if ($order->status !== 'pendiente') $this->fail('Este pedido no admite liberación.');
+            $early = $order->scheduled_date->toDateString() > now()->toDateString();
+            if ($early) {
+                abort_unless(auth()->user()->hasRole('Administrador'), 403);
+                Validator::make(['reason'=>$reason], ['reason'=>'required|string|min:5|max:500'])->validate();
+            }
+            $order->update(['production_released_at'=>now(),'production_released_by'=>auth()->id(),'production_release_reason'=>$early ? $reason : null]);
+            $this->audit($order, 'production_released', ['early'=>$early,'reason'=>$early ? $reason : null]);
+            app(TicketService::class)->queue($order, 'liberacion');
+        }, 3);
+    }
+
     public function status(int $id, string $next): void
     {
         Gate::authorize('dispatch.manage');
         DB::transaction(function () use ($id, $next) {
             $order = Order::lockForUpdate()->findOrFail($id);
+            if (!$order->production_released_at) $this->fail('Libera el pedido a cocina antes de iniciar la preparación.');
             $allowed = ['pendiente' => ['en_preparacion'], 'en_preparacion' => ['listo'], 'listo' => $order->delivery_type === 'domicilio' ? ['en_ruta'] : ['entregado'], 'en_ruta' => ['entregado']];
             if (! in_array($next, $allowed[$order->status] ?? [])) {
                 $this->fail('Transición de estado inválida.');

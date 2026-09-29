@@ -19,7 +19,8 @@ Route::middleware(['auth', ActiveUser::class])->group(function () {
         } abort(403, 'No tienes permisos asignados.');
     });
     Route::post('/logout', [C::class, 'logout'])->name('logout');
-    Route::get('/pos', Pos::class)->name('pos');
+    Route::get('/pos', Pos::class)->middleware(\App\Http\Middleware\RequireOpenCashShift::class)->name('pos');
+    Route::get('/calendario', \App\Livewire\DeliveryCalendar::class)->name('calendar');
     Route::get('/pedidos', [C::class, 'orders'])->name('orders');
     Route::get('/pedidos/{order}', [C::class, 'show'])->name('orders.show');
     Route::post('/pedidos/{order}/pago', [C::class, 'pay']);
@@ -28,6 +29,7 @@ Route::middleware(['auth', ActiveUser::class])->group(function () {
     Route::post('/pedidos/{order}/editar', [C::class, 'editOrder']);
     Route::post('/pedidos/{order}/estado', [C::class, 'status']);
     Route::post('/pedidos/{order}/repartidor', [C::class, 'assign']);
+    Route::post('/pedidos/{order}/liberar', [C::class, 'release']);
     Route::get('/despacho', [C::class, 'dispatch'])->name('dispatch');
     Route::get('/caja', [C::class, 'cash'])->name('cash');
     Route::post('/caja/abrir', [C::class, 'openCash']);
@@ -38,6 +40,8 @@ Route::middleware(['auth', ActiveUser::class])->group(function () {
     Route::get('/categorias', \App\Livewire\Categories::class)->name('categories');
     Route::get('/repartidores', [C::class, 'drivers'])->name('drivers');
     Route::post('/repartidores', [C::class, 'saveDriver']);
+    Route::get('/configuracion', [\App\Http\Controllers\CompanySettingsController::class, 'edit'])->name('settings');
+    Route::post('/configuracion', [\App\Http\Controllers\CompanySettingsController::class, 'update'])->name('settings.update');
     Route::get('/usuarios', [C::class, 'users'])->name('users');
     Route::post('/usuarios', [C::class, 'saveUser']);
     Route::post('/roles', [C::class, 'saveRole']);

@@ -57,7 +57,7 @@ class Pos extends Component
 
     public string $timeInput = '';
 
-    public string $delivery_type = 'sucursal';
+    public string $delivery_type = 'domicilio';
 
     public string $draftNotes = '';
 
@@ -73,6 +73,7 @@ class Pos extends Component
     {
         Gate::authorize('pos.sell');
         $this->request_key = (string) Str::uuid();
+        $this->dateInput = now()->toDateString();
         $this->customerForm = CustomerService::blank();
     }
 
@@ -110,7 +111,7 @@ class Pos extends Component
         $this->customerId = $c->id;
         $this->customerForm = $c->only(array_keys(CustomerService::blank()));
         $this->stage = 'schedule';
-        $this->dateInput = $this->scheduled_date;
+        $this->dateInput = $this->scheduled_date ?: ($this->dateInput ?: now()->toDateString());
         $this->timeInput = $this->scheduled_time;
         $this->resetValidation();
     }
@@ -137,7 +138,7 @@ class Pos extends Component
     {
         $this->override = false;
         $this->stage = 'schedule';
-        $this->dateInput = $this->scheduled_date;
+        $this->dateInput = $this->scheduled_date ?: ($this->dateInput ?: now()->toDateString());
         $this->timeInput = $this->scheduled_time;
         $this->modalProductId = null;
         $this->resetValidation();
@@ -289,7 +290,7 @@ return Customer::findOrFail($this->customerId);
             app(CustomerService::class)->requireAddress($c);
         }
         $order = app(OrderService::class)->create(['request_key' => $this->request_key, 'customer_id' => $c->id, 'customer_name' => $c->name, 'customer_phone' => $c->phone, 'delivery_type' => $this->delivery_type, 'delivery_address' => $c->address(), 'delivery_cost' => $this->delivery_cost, 'delivery_driver_id' => $this->delivery_driver_id ?: null, 'scheduled_date' => $this->scheduled_date, 'scheduled_time' => $this->scheduled_time, 'items' => $this->items, 'payments' => collect($this->payments)->map(fn ($amount, $method) => ['method' => $method, 'amount' => $amount ?: 0])->values()->all(), 'override' => $this->override]);
-        session()->flash('success', 'Pedido registrado y comandas enviadas a impresión.');
+        session()->flash('success', 'Pedido registrado. Comprobante enviado a caja; pendiente de liberación a cocina.');
 
         return redirect()->route('orders.show', $order);
     }

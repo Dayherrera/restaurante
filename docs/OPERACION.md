@@ -61,3 +61,44 @@ Cocina, caja y el monitor de despacho muestran cantidad y nombre del producto, e
 Caja utiliza un recibo de 32 columnas para papel de 58 mm: encabezado centrado, folio, entrega, precios por partida, total, pagos por método, reembolsos y saldo. Los movimientos parciales identifican expresamente que los totales corresponden al pedido completo. No se añaden cargos ni impuestos inventados.
 
 Los trabajos de impresión ya generados conservan su contenido original. Las nuevas comandas y reimpresiones usan el formato nuevo. Para aplicar en otra instalación existente: respaldar y ejecutar las migraciones; `scripts/apply-ticket-folios.php` automatiza respaldo y migración para restaurant_db.
+
+## Valores iniciales y seguimiento de saldos (26/09/2026)
+
+Los pedidos nuevos proponen la fecha actual de la sucursal y entrega a domicilio. La hora debe capturarse; para domicilio sigue siendo obligatoria la dirección completa. Editar los datos del cliente conserva la fecha y el tipo de entrega elegidos.
+
+Los abonos desde Ver pedido generan comprobante exclusivamente para Caja. Las comandas iniciales y las cancelaciones siguen enviándose a las áreas correspondientes. En Pedidos, las filas con saldo pendiente aparecen con fondo ámbar, importe destacado y la etiqueta Saldo pendiente; al liquidar desaparece ese resaltado.
+
+En Pedidos, el filtro usa un rango inclusivo de fechas de entrega (Desde/Hasta). Al entrar muestra hoy; el botón Hoy restablece el rango al día actual. La búsqueda por folio o cliente se combina con el rango seleccionado.
+
+## Configuración general de la empresa
+
+En Administración > Configuración general se capturan nombre comercial (obligatorio), razón social, RFC, dirección, teléfono/WhatsApp, correo, sitio web y mensaje al pie del ticket. Solo los usuarios con permiso users.manage pueden consultar o modificar estos datos. Los campos opcionales vacíos se omiten al imprimir.
+
+Los datos se imprimen en el comprobante de Caja para el cliente, incluidas nuevas reimpresiones y abonos. Cocina y Barra conservan su encabezado operativo. Los trabajos ya generados mantienen el texto original; reintentar un trabajo no cambia sus datos. No se precargan datos fiscales ni de contacto sin confirmar.
+
+La migración crea company_settings y conserva los datos de operación. El script scripts/apply-company-settings.php aplica las migraciones con respaldo previo en restaurant_db.
+
+## Agenda y liberación manual a cocina (27/09/2026)
+
+Cocina y Despacho muestra por defecto todos los pedidos activos con entrega hoy. Atrasados muestra los pendientes de días anteriores; el tablero avisa cuántos requieren revisión. Anticipados autorizados reúne pedidos futuros cuya preparación fue autorizada. Agenda futura abre en Pedidos la lista de programados sin liberar; no habilita preparación por consultar la agenda.
+
+Un pedido nuevo imprime solo el comprobante de Caja. El personal con permiso de despacho debe pulsar Liberar a cocina para generar las comandas operativas; después puede Comenzar preparación. La liberación es única y queda auditada. Los abonos siguen imprimiendo solo en Caja. Modificaciones, cancelaciones y reimpresiones no envían a cocina/barra antes de la liberación.
+
+Un pedido futuro únicamente puede liberarlo un usuario con rol Administrador y permiso de despacho, desde Ver pedido, mediante Autorizar preparación anticipada: requiere motivo y confirmación. La validación se ejecuta en servidor, incluyendo cambios de estado y reintentos de impresión. El pedido aparecerá en Anticipados autorizados, con la fecha destacada.
+
+Programado es una clasificación por fecha y ausencia de liberación, no un nuevo estado almacenado. Al llegar su día aparece automáticamente al consultar o actualizar el tablero sin tarea programada. La consulta no imprime ni cambia estados.
+
+Actualización: scripts/apply-production-release.php hace respaldo y migración. Los pedidos ya en preparación/listos/en ruta se conservan liberados para no interrumpir el trabajo; los pendientes requieren liberación. Las comandas antiguas aún en cola para pendientes se retienen como fallidas. El papel ya impreso o enviado a la impresora no puede retirarse automáticamente: debe revisarse al comenzar a usar este flujo.
+
+Al entrar al Punto de venta, el sistema exige una caja abierta del usuario actual; si no existe, redirige a Mi caja para abrir turno. El folio se destaca en tamaño y negrita en Pedidos, detalle del pedido y Cocina y Despacho.
+
+
+## Calendario de entregas
+
+El menú Calendario abre /calendario con el permiso orders.view. Muestra una cuadrícula mensual de lunes a domingo, navegación anterior/siguiente y Hoy. En pantallas pequeñas comienza en Agenda; los botones Mes y Agenda permiten cambiar la vista. Se usa FullCalendar 6.1.21 con Vite y Livewire; los recursos se sirven localmente, sin CDN.
+
+Cada día indica únicamente el número de pedidos no cancelados, sin importes. Se muestran hasta cuatro tarjetas y un enlace para consultar el resto. Pulsar el contador o una fecha abre todos los pedidos de ese día por hora; pulsar una tarjeta abre su detalle. Mostrar cancelados los incorpora a la consulta, pero nunca al conteo vigente.
+
+El panel muestra folio, cliente, entrega, estado, productos, elecciones, notas, repartidor, total, pagado neto y saldo. Consultar no cambia estados ni imprime. Reimprimir requiere orders.reprint y respeta la liberación a cocina. Asignar repartidor requiere dispatch.manage y un repartidor activo; no se permite en cancelados o entregados. Ver pedido / acciones lleva al detalle existente para edición o autorizaciones.
+
+Actualizar vuelve a consultar el intervalo visible. Esta primera versión no cambia fecha/hora, no permite arrastrar pedidos y no incluye fechas especiales. El importe no aparece como indicador diario. Los colores se acompañan de etiquetas para distinguir estados, saldo pendiente y liberación.

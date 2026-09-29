@@ -8,7 +8,7 @@ class Order extends Model
 {
     protected $guarded = ['id'];
 
-    protected $casts = ['scheduled_date' => 'date', 'total' => 'decimal:2', 'amount_paid' => 'decimal:2', 'balance_due' => 'decimal:2'];
+    protected $casts = ['production_released_at'=>'datetime', 'scheduled_date' => 'date', 'total' => 'decimal:2', 'amount_paid' => 'decimal:2', 'balance_due' => 'decimal:2'];
 
     public function getOrderNumberAttribute($value): string
     {

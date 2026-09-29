@@ -54,10 +54,16 @@ class PosController extends Controller
     public function orders(Request $r)
     {
         Gate::authorize('orders.view');
-        $r->validate(['date' => 'nullable|date', 'q' => 'nullable|string|max:120']);
-        $orders = Order::with('driver')->when($r->date, fn ($q) => $q->whereDate('scheduled_date', $r->date))->when($r->q, fn ($q) => $q->where(fn ($w) => $w->where('order_number', 'like', '%'.$r->q.'%')->orWhere('customer_name', 'like', '%'.$r->q.'%')))->latest()->paginate(20)->withQueryString();
+        $r->merge([
+            'date_from' => $r->input('date_from', now()->toDateString()),
+            'date_to' => $r->input('date_to', now()->toDateString()),
+        ]);
+        $data = $r->validate(['date_from' => 'required|date_format:Y-m-d', 'date_to' => 'required|date_format:Y-m-d|after_or_equal:date_from', 'q' => 'nullable|string|max:120', 'agenda'=>'nullable|in:1']);
+        $dateFrom = $data['date_from'];
+        $dateTo = $data['date_to'];
+        $orders = Order::with('driver')->when($r->input('agenda')==='1', fn($q)=>$q->whereDate('scheduled_date','>',today())->where('status','pendiente')->whereNull('production_released_at'), fn($q)=>$q->whereDate('scheduled_date', '>=', $dateFrom)->whereDate('scheduled_date', '<=', $dateTo))->when($r->q, fn ($q) => $q->where(fn ($w) => $w->where('order_number', 'like', '%'.$r->q.'%')->orWhere('customer_name', 'like', '%'.$r->q.'%')))->latest()->paginate(20)->withQueryString();
 
-        return view('orders', compact('orders'));
+        return view('orders', compact('orders', 'dateFrom', 'dateTo'));
     }
 
     public function show(Order $order)
@@ -116,14 +122,28 @@ class PosController extends Controller
             app(TicketService::class)->queue($o, 'modificacion');
         });
 
-        return back()->with('success', 'Cambios registrados y comanda de modificación enviada.');
+        return back()->with('success', 'Cambios registrados. Cocina recibe la modificación únicamente si el pedido ya fue liberado.');
     }
 
-    public function dispatch()
+    public function release(Request $r, Order $order)
+    {
+        $data=$r->validate(['reason'=>'nullable|string|max:500']);
+        app(OrderService::class)->release($order->id,$data['reason']??null);
+        return back()->with('success','Pedido liberado. Comandas enviadas a producción.');
+    }
+
+    public function dispatch(Request $r)
     {
         Gate::authorize('dispatch.manage');
-
-        return view('dispatch', ['orders' => Order::with('items', 'driver')->whereNotIn('status', ['entregado', 'cancelado'])->orderBy('scheduled_date')->orderBy('scheduled_time')->get(), 'drivers' => DeliveryDriver::where('is_active', true)->get()]);
+        $view=$r->validate(['view'=>'nullable|in:today,overdue,early'])['view']??'today';
+        $base=Order::with('items','driver')->whereNotIn('status',['entregado','cancelado']);
+        $overdue=(clone $base)->whereDate('scheduled_date','<',today())->count();
+        $early=(clone $base)->whereDate('scheduled_date','>',today())->whereNotNull('production_released_at')->count();
+        $orders=$base->when($view==='today',fn($q)=>$q->whereDate('scheduled_date',today()))
+            ->when($view==='overdue',fn($q)=>$q->whereDate('scheduled_date','<',today()))
+            ->when($view==='early',fn($q)=>$q->whereDate('scheduled_date','>',today())->whereNotNull('production_released_at'))
+            ->orderBy('scheduled_date')->orderBy('scheduled_time')->get();
+        return view('dispatch',compact('orders','view','overdue','early')+['drivers'=>DeliveryDriver::where('is_active',true)->get()]);
     }
 
     public function status(Request $r, Order $order)
@@ -326,6 +346,7 @@ class PosController extends Controller
         Gate::authorize('printing.manage');
         DB::transaction(function () use ($job) {
             $job = PrintJob::lockForUpdate()->findOrFail($job->id);
+            if ($job->print_area_id != \App\Models\PrintArea::where('name','Caja')->value('id') && !Order::findOrFail($job->order_id)->production_released_at) throw ValidationException::withMessages(['print'=>'Libera el pedido a cocina; no se puede reintentar una comanda sin autorización.']);
             if ($job->status === 'processing' && $job->leased_at > now()->subMinutes(2)->toDateTimeString()) {
                 throw ValidationException::withMessages(['print' => 'El agente todavía procesa este trabajo.']);
             } $job->update(['status' => 'pending', 'lease_token' => null, 'leased_at' => null, 'attempts' => 0, 'error' => null]);

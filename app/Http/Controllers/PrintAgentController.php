@@ -23,7 +23,7 @@ class PrintAgentController extends Controller
         return DB::transaction(function () use ($data) {
             // Expired jobs are held for manual reconciliation to avoid automatic duplicate tickets.
             PrintJob::where('status', 'processing')->where('leased_at', '<', now()->subMinutes(2))->update(['status' => 'failed', 'error' => 'Confirmación del agente perdida; verifica la impresora antes de reintentar.']);
-            $job = PrintJob::where('status', 'pending')->whereIn('print_area_id', $data['areas'])->orderBy('id')->lockForUpdate()->first();
+            $job = PrintJob::where('status', 'pending')->whereIn('print_area_id', $data['areas'])->where(function($q){$q->where('print_area_id', \App\Models\PrintArea::where('name','Caja')->value('id'))->orWhereIn('order_id', \App\Models\Order::whereNotNull('production_released_at')->select('id'));})->orderBy('id')->lockForUpdate()->first();
             if (! $job) {
                 return response()->json(['job' => null]);
             }

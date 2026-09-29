@@ -36,6 +36,7 @@ class RealMenuTest extends TestCase
         $this->assertEquals(0, Product::sum('daily_limit'));
         $this->assertDatabaseMissing('products', ['name' => 'Refresco']);
         $this->actingAs(User::where('email', 'admin@magueyes.local')->first());
+        app(CashService::class)->open('0');
         $this->get('/pos')->assertOk()->assertSee('Buscar cliente por nombre o teléfono')->assertDontSee('INDIVIDUAL');
     }
 
@@ -53,6 +54,7 @@ class RealMenuTest extends TestCase
         $p->update(['description' => 'Descripción cambiada']);
         $this->assertStringContainsString('Quesillo', $order->items()->first()->product_description);
         $this->get('/pedidos/'.$order->id)->assertOk()->assertSee('Quesillo');
-        $this->get('/despacho')->assertOk()->assertDontSee('Quesillo');
+        app(OrderService::class)->release($order->id, 'Prueba anticipada');
+        $this->get('/despacho?view=early')->assertOk()->assertDontSee('Quesillo');
     }
 }
