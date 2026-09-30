@@ -40,3 +40,23 @@ tr.order-unpaid td:first-child { border-left: 4px solid #c2410c; }
 .calendar-item-prices{gap:8px;flex-wrap:wrap;margin-top:8px;font-size:13px}.delivery-calendar .fc-listWeek-view .calendar-event-content,.delivery-calendar .fc-listDay-view .calendar-event-content{font-size:13px}.delivery-calendar .fc-listWeek-view .fc-list-event-time,.delivery-calendar .fc-listDay-view .fc-list-event-time{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}.delivery-calendar .fc-listWeek-view .calendar-event-content strong,.delivery-calendar .fc-listDay-view .calendar-event-content strong{white-space:normal}
 
 .delivery-calendar .fc-dayGridWeek-view .calendar-week-row{display:flex;align-items:flex-start;gap:6px;padding:5px 2px;font-size:12px}.delivery-calendar .calendar-week-time{flex-shrink:0;font-size:12px;font-variant-numeric:tabular-nums}.delivery-calendar .calendar-week-row>div{min-width:0}.delivery-calendar .fc-dayGridWeek-view .calendar-week-row strong{white-space:normal;overflow-wrap:anywhere}.delivery-calendar .fc-dayGridWeek-view .fc-daygrid-event{margin-top:5px;margin-bottom:5px}.delivery-calendar .fc-listDay-view .fc-list-day-text{text-transform:capitalize}
+
+/* Navegación colapsable: el POS comienza con todo el ancho disponible. */
+[x-cloak]{display:none!important}
+.menu-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex-shrink:0;border:1px solid #dce3dc;border-radius:9px;background:#f1f5ec;color:#23412d;margin-right:16px}
+.menu-toggle:hover{background:#e4ecd9}.menu-toggle:focus-visible,.sidebar-close:focus-visible{outline:3px solid #859b4d;outline-offset:3px}
+.app-shell .topbar .breadcrumb{margin-right:auto}.app-shell .workspace{min-width:0}
+.app-shell.sidebar-collapsed>.sidebar{display:none}
+.app-shell.sidebar-collapsed>.workspace{margin-left:0;width:100%}
+.sidebar-backdrop,.sidebar-close{display:none}
+@media(max-width:850px){
+ .app-shell>.sidebar{position:fixed;inset:0 auto 0 0;width:min(280px,85vw);height:100dvh;padding:22px 18px;z-index:60;display:flex;overflow-y:auto}
+ .app-shell>.sidebar nav{display:block;overflow:visible}.app-shell>.sidebar .nav-item{white-space:normal;padding:12px}
+ .app-shell>.sidebar .nav-label{display:block}.app-shell>.sidebar .sidebar-foot{display:block}
+ .app-shell>.sidebar .brand{margin-right:30px;margin-bottom:18px}
+ .sidebar-close{display:block;position:absolute;right:10px;top:10px;width:40px;height:40px;font-size:28px;color:#fff;background:transparent;border:0}
+ .sidebar-backdrop{display:block;position:fixed;inset:0;z-index:59;background:#142b2580;border:0;padding:0}
+ .app-shell.sidebar-collapsed>.sidebar-backdrop{display:none}
+ .app-shell>.workspace{margin-left:0;width:100%}.menu-toggle{margin-right:10px}
+}
+@media print{.menu-toggle,.sidebar-backdrop,.sidebar-close{display:none!important}}

@@ -108,3 +108,5 @@ El calendario incluye botones Mes, Semana, Día y Agenda. Semana y Día organiza
 Semana y Día ahora usan listas cronológicas: una fila por pedido, hora a la izquierda y sin intervalos vacíos. Mes y Agenda conservan su presentación. El detalle del calendario incluye el precio unitario guardado en la venta y el importe (cantidad por precio unitario) de cada partida, incluso si el precio del catálogo cambia después.
 
 Ajuste de presentación: Semana usa siete columnas (lunes a domingo) con filas compactas por pedido y sin cuadrícula horaria. Día conserva su lista y muestra la fecha completa en el título.
+
+El botón ☰ de la barra superior permite mostrar u ocultar el menú izquierdo. Punto de venta abre con el menú colapsado. En pantallas pequeñas el menú aparece sobre el contenido y se cierra con ×, Escape o pulsando fuera del panel.
