@@ -19,7 +19,7 @@ window.createDeliveryCalendar = (wire, root, businessToday) => {
   plugins:[dayGridPlugin,listPlugin,interactionPlugin],locale:esLocale,firstDay:1,initialDate:businessToday,now:businessToday,
   initialView:window.innerWidth<700?'listMonth':'dayGridMonth',height:'auto',
   headerToolbar:{left:'prev,next today',center:'title',right:'dayGridMonth,dayGridWeek,listDay,listMonth'},
-  buttonText:{today:'Hoy',month:'Mes',week:'Semana',day:'Día',list:'Agenda'},
+  buttonText:{today:'Hoy',dayGridMonth:'Mes',dayGridWeek:'Semana',listDay:'Día',listMonth:'Agenda'},
   views:{dayGridWeek:{buttonText:'Semana',dayMaxEvents:false,dayMaxEventRows:false,dayHeaderFormat:{weekday:'short',day:'numeric',month:'short'}},listDay:{buttonText:'Día',displayEventEnd:false,titleFormat:{weekday:'long',day:'numeric',month:'long',year:'numeric'}},listMonth:{buttonText:'Agenda'}},
   editable:false,selectable:false,dayMaxEvents:4,eventOrder:'start,id',eventOrderStrict:true,
   eventTimeFormat:{hour:'2-digit',minute:'2-digit',hour12:false},
