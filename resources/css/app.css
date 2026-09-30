@@ -23,3 +23,20 @@ tr.order-unpaid td:first-child { border-left: 4px solid #c2410c; }
 .calendar-state-pendiente{background:#fef3c7!important;color:#78350f!important}.calendar-state-en_preparacion{background:#dbeafe!important;color:#1e40af!important}.calendar-state-listo{background:#ccfbf1!important;color:#115e59!important}.calendar-state-en_ruta{background:#ede9fe!important;color:#5b21b6!important}.calendar-state-entregado{background:#dcfce7!important;color:#166534!important}.calendar-state-cancelado{background:#fee2e2!important;color:#991b1b!important}
 .calendar-dialog{position:fixed;inset:0 0 0 auto;margin:0;width:min(560px,100vw);height:100dvh;max-height:100dvh;max-width:100vw;border:0;padding:24px;background:#fffdf7;color:#25372c;overflow:auto;box-shadow:-8px 0 40px #0002}.calendar-dialog::backdrop{background:#0007}.calendar-dialog header{margin-bottom:18px}.calendar-dialog h3{margin:15px 0 8px}.calendar-dialog p{margin:8px 0}.calendar-dialog .card{margin:18px 0;padding:16px}.calendar-day-order{display:flex;flex-direction:column;gap:5px;width:100%;text-align:left;border:1px solid #d9e2db;border-radius:8px;padding:14px;margin:10px 0;background:white;cursor:pointer}.calendar-day-order:hover{background:#f1f5ed}
 @media(max-width:700px){.delivery-calendar{padding:8px}.delivery-calendar .fc-header-toolbar{flex-wrap:wrap;gap:12px}.delivery-calendar .fc-toolbar-title{font-size:1.1rem}.calendar-dialog{padding:18px}}
+
+.delivery-calendar .fc-timegrid-event .calendar-event-content strong{white-space:normal}.delivery-calendar .fc-timegrid-event{min-height:25px}.delivery-calendar .fc-header-toolbar{flex-wrap:wrap;gap:12px}.delivery-calendar .fc-timegrid-slot-label{font-size:12px}
+
+/* Tarjetas legibles únicamente en la cuadrícula horaria (Semana/Día). */
+.delivery-calendar .fc-timegrid-slot{height:72px}
+.delivery-calendar .fc-timegrid-event{padding:5px 7px;border-left:4px solid currentColor!important;border-radius:6px;box-shadow:0 1px 3px #162f251a;overflow:hidden}
+.delivery-calendar .fc-timegrid-event .fc-event-main{color:inherit!important;padding:0;height:100%;overflow:hidden}
+.delivery-calendar .fc-timegrid-event .calendar-timed-card{color:inherit;font-size:12px;line-height:1.25;height:100%;overflow:hidden}
+.delivery-calendar .fc-timegrid-event .calendar-card-time{display:block;font-size:13px;font-weight:800;margin-bottom:3px;font-variant-numeric:tabular-nums}
+.delivery-calendar .fc-timegrid-event .calendar-timed-card strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:700}
+.delivery-calendar .fc-timegrid-event .calendar-timed-card small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;margin-top:3px}
+.delivery-calendar .fc-timegrid-slot-label{vertical-align:top;padding-top:7px;font-size:12px;color:#33483c;font-weight:600}
+.delivery-calendar .fc-timegrid-event:focus-visible{outline:3px solid #204b36;outline-offset:2px}
+
+.calendar-item-prices{gap:8px;flex-wrap:wrap;margin-top:8px;font-size:13px}.delivery-calendar .fc-listWeek-view .calendar-event-content,.delivery-calendar .fc-listDay-view .calendar-event-content{font-size:13px}.delivery-calendar .fc-listWeek-view .fc-list-event-time,.delivery-calendar .fc-listDay-view .fc-list-event-time{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}.delivery-calendar .fc-listWeek-view .calendar-event-content strong,.delivery-calendar .fc-listDay-view .calendar-event-content strong{white-space:normal}
+
+.delivery-calendar .fc-dayGridWeek-view .calendar-week-row{display:flex;align-items:flex-start;gap:6px;padding:5px 2px;font-size:12px}.delivery-calendar .calendar-week-time{flex-shrink:0;font-size:12px;font-variant-numeric:tabular-nums}.delivery-calendar .calendar-week-row>div{min-width:0}.delivery-calendar .fc-dayGridWeek-view .calendar-week-row strong{white-space:normal;overflow-wrap:anywhere}.delivery-calendar .fc-dayGridWeek-view .fc-daygrid-event{margin-top:5px;margin-bottom:5px}.delivery-calendar .fc-listDay-view .fc-list-day-text{text-transform:capitalize}

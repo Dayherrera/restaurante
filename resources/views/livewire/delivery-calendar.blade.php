@@ -1,6 +1,7 @@
 <div>
-<div class="page-heading"><div><span class="eyebrow">PLANIFICACIÓN</span><h1>Calendario de entregas</h1><p class="muted">Agenda por fecha de entrega. Consultar un pedido no lo libera a cocina.</p></div><a class="secondary" href="{{ route('orders') }}">Ver lista de pedidos</a></div>
+<div class="page-heading"><div><span class="eyebrow">PLANIFICACIÓN</span><h1>Calendario de entregas</h1><p class="muted">Agenda por fecha y hora de entrega. Consultar un pedido no lo libera a cocina.</p></div><a class="secondary" href="{{ route('orders') }}">Ver lista de pedidos</a></div>
 <div class="filter-bar"><label class="check-label"><input type="checkbox" wire:model.live="showCancelled"> Mostrar cancelados</label><button class="secondary" wire:click="refreshCalendar">Actualizar</button><span class="muted">El conteo diario excluye cancelados.</span></div>
+<p class="muted tiny">Semana muestra los días en columnas con una fila por pedido. Día muestra la lista de entregas con la hora a la izquierda, sin horarios vacíos.</p>
 <div class="calendar-legend"><span class="calendar-state-pendiente">Pendiente / Programado</span><span class="calendar-state-en_preparacion">En preparación</span><span class="calendar-state-listo">Listo</span><span class="calendar-state-en_ruta">En ruta</span><span class="calendar-state-entregado">Entregado</span><span class="calendar-state-cancelado">Cancelado</span></div>
 <div class="card delivery-calendar" wire:ignore><p data-calendar-error class="notice error" hidden role="alert"></p><p data-calendar-loading class="muted" role="status">Cargando agenda…</p><div data-calendar></div></div>
 @if($orderId || $day)
@@ -16,6 +17,7 @@
 <p class="muted">{{ $selectedOrder->production_released_at?'Liberado a cocina':'Sin liberar a cocina' }}</p>
 <h3>Productos y preparación</h3>
 @foreach($selectedOrder->items as $item)<div class="order-line {{ $item->is_cancelled?'canceled':'' }}"><strong>{{ $item->quantity }} × {{ $item->product_name }}</strong>@if($item->is_cancelled)<span> · Partida cancelada</span>@endif
+<div class="row-between calendar-item-prices"><span>Precio unitario: <b>${{ number_format($item->unit_price,2) }}</b></span><span>Importe: <b>${{ number_format($item->unit_price * $item->quantity,2) }}</b></span></div>
 @foreach($item->selected_options??[] as $option)<p class="muted">{{ isset($option['group']) && strcasecmp(trim($option['group']),'Botanas a elegir')!==0?$option['group'].': ':'' }}{{ $option['quantity'] }} × {{ $option['name'] }}</p>@endforeach
 @if($item->kitchen_notes)<p class="notice">{{ $item->kitchen_notes }}</p>@endif</div>@endforeach
 @if($selectedOrder->delivery_type==='domicilio')<h3>Entrega</h3><p>{{ $selectedOrder->delivery_address }}</p><p>Repartidor: {{ $selectedOrder->driver?->name??'Sin asignar' }}</p>

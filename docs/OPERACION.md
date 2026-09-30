@@ -102,3 +102,9 @@ Cada día indica únicamente el número de pedidos no cancelados, sin importes. 
 El panel muestra folio, cliente, entrega, estado, productos, elecciones, notas, repartidor, total, pagado neto y saldo. Consultar no cambia estados ni imprime. Reimprimir requiere orders.reprint y respeta la liberación a cocina. Asignar repartidor requiere dispatch.manage y un repartidor activo; no se permite en cancelados o entregados. Ver pedido / acciones lleva al detalle existente para edición o autorizaciones.
 
 Actualizar vuelve a consultar el intervalo visible. Esta primera versión no cambia fecha/hora, no permite arrastrar pedidos y no incluye fechas especiales. El importe no aparece como indicador diario. Los colores se acompañan de etiquetas para distinguir estados, saldo pendiente y liberación.
+
+El calendario incluye botones Mes, Semana, Día y Agenda. Semana y Día organizan los pedidos por hora de entrega (formato de 24 horas), con conteo diario y acceso al mismo panel. Las tarjetas no representan duración de preparación. Anterior/Siguiente avanzan según la vista seleccionada.
+
+Semana y Día ahora usan listas cronológicas: una fila por pedido, hora a la izquierda y sin intervalos vacíos. Mes y Agenda conservan su presentación. El detalle del calendario incluye el precio unitario guardado en la venta y el importe (cantidad por precio unitario) de cada partida, incluso si el precio del catálogo cambia después.
+
+Ajuste de presentación: Semana usa siete columnas (lunes a domingo) con filas compactas por pedido y sin cuadrícula horaria. Día conserva su lista y muestra la fecha completa en el título.
