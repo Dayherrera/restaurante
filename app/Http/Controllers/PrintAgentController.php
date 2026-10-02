@@ -28,10 +28,7 @@ class PrintAgentController extends Controller
                 return response()->json(['job' => null]);
             }
             $job->update(['status' => 'processing', 'lease_token' => Str::uuid(), 'leased_at' => now(), 'attempts' => $job->attempts + 1]);
-            $text = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $job->payload);
-            $text = preg_replace('/[\x00-\x09\x0B-\x1F\x7F]/', '', $text);
-
-            return response()->json(['job' => ['id' => $job->id, 'area_id' => $job->print_area_id, 'lease_token' => $job->lease_token, 'payload_base64' => base64_encode("\x1B\x40".$text."\n\n\n\x1D\x56\x00")]]);
+            return response()->json(['job' => ['id' => $job->id, 'area_id' => $job->print_area_id, 'lease_token' => $job->lease_token, 'payload_base64' => base64_encode(app(\App\Services\EscPosRenderer::class)->render($job))]]);
         });
     }
 

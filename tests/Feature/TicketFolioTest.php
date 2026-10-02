@@ -56,6 +56,7 @@ class TicketFolioTest extends TestCase
         $p = Product::where('name', 'Rib Eye (prueba)')->first();
         $p->update(['description' => 'DESCRIPCION QUE NO DEBE IMPRIMIRSE']);
         $o = app(OrderService::class)->create($this->data());
+        app(TicketService::class)->queue($o, 'reimpresion');
         $jobs = PrintJob::where('order_id', $o->id)->get();
         $this->assertCount(1, $jobs);
         foreach ($jobs as $job) {
@@ -97,7 +98,7 @@ class TicketFolioTest extends TestCase
     {
         $order = app(OrderService::class)->create($this->data());
         $this->get('/pedidos?'.http_build_query(['date_from'=>now()->addDay()->toDateString(),'date_to'=>now()->addDay()->toDateString()]))->assertOk()->assertSee('Saldo pendiente')->assertSee('order-unpaid');
-        $before = PrintJob::max('id');
+        $before = PrintJob::max('id') ?? 0;
         $key = (string) Str::uuid();
         app(OrderService::class)->pay($order->id, 'efectivo', 195, $key);
         app(OrderService::class)->pay($order->id, 'efectivo', 195, $key);
@@ -139,6 +140,7 @@ class TicketFolioTest extends TestCase
         $this->assertDatabaseHas('company_settings',['id'=>1,'business_name'=>'Empresa Prueba']);
         $this->post('/configuracion',array_replace($data,['business_name'=>'','email'=>'invalid']))->assertSessionHasErrors(['business_name','email']);
         $order=app(OrderService::class)->create($this->data());
+        app(TicketService::class)->queue($order, 'reimpresion');
         $cashId=PrintArea::where('name','Caja')->value('id');
         foreach(PrintJob::where('order_id',$order->id)->get() as $job){
             if($job->print_area_id==$cashId){
@@ -153,5 +155,79 @@ class TicketFolioTest extends TestCase
         $this->get('/configuracion')->assertForbidden();
         $this->post('/configuracion',$data)->assertForbidden();
         $this->assertDatabaseHas('company_settings',['business_name'=>'Nombre actualizado']);
+    }
+    public function test_new_orders_do_not_print_until_manual_request_even_when_paid(): void
+    {
+        foreach ([[], [['method'=>'efectivo','amount'=>100]], [['method'=>'efectivo','amount'=>295]]] as $payments) {
+            $order=app(OrderService::class)->create(array_replace($this->data(), ['payments'=>$payments]));
+            $this->assertSame(0, PrintJob::where('order_id',$order->id)->count());
+            $this->get('/pedidos/'.$order->id)->assertOk()->assertSee('Imprimir comprobantes')->assertDontSee('Reimprimir comprobantes');
+            $this->post('/pedidos/'.$order->id.'/reimprimir')->assertSessionHasNoErrors();
+            $jobs=PrintJob::where('order_id',$order->id)->get();
+            $this->assertCount(1,$jobs);
+            $this->assertEquals(PrintArea::where('name','Caja')->value('id'),$jobs->first()->print_area_id);
+        }
+    }
+    public function test_all_ticket_areas_use_twelve_hour_delivery_and_issue_times(): void
+    {
+        $this->travelTo(now()->setTime(21, 0));
+        $order = app(OrderService::class)->create(array_replace($this->data(), ['delivery_driver_id'=>\App\Models\DeliveryDriver::create(['name'=>'Repartidor de prueba', 'is_active'=>true])->id, 'delivery_type'=>'domicilio', 'delivery_address'=>'Calle de prueba numero 123 junto al parque central']));
+        $barItem = $order->items->first()->replicate();
+        $barItem->print_area_id = PrintArea::where('name', 'Barra')->value('id');
+        $barItem->save();
+        app(OrderService::class)->release($order->id, 'Prueba de formato horario');
+        $order->refresh();
+
+        foreach (['21:00:00'=>'9:00 PM', '00:00:00'=>'12:00 AM', '12:00:00'=>'12:00 PM', '09:05:00'=>'9:05 AM'] as $time=>$expected) {
+            $order->update(['scheduled_time'=>$time]);
+            $before = PrintJob::max('id');
+            app(TicketService::class)->queue($order, 'reimpresion');
+            $jobs = PrintJob::where('id', '>', $before)->get();
+            $this->assertCount(3, $jobs);
+            foreach ($jobs as $job) {
+                $this->assertStringContainsString('Entrega: '.$order->scheduled_date->format('d/m/Y').' '.$expected, $job->payload);
+                if ($job->print_area_id == PrintArea::where('name', 'Caja')->value('id')) {
+                    $this->assertStringContainsString('Emitido: '.now()->format('d/m/Y').' 9:00 PM', $job->payload);
+                }
+                $bytes = app(\App\Services\EscPosRenderer::class)->render($job);
+                if ($job->print_area_id == PrintArea::where('name', 'Caja')->value('id')) {
+                    $this->assertNull($job->line_styles);
+                    $this->assertStringNotContainsString("\x1D\x21\x01", $bytes);
+                } else {
+                    $this->assertStringContainsString("\x1B\x45\x01\x1D\x21\x01Entrega: ", $bytes);
+                    $this->assertStringContainsString("\x1B\x45\x01\x1D\x21\x011 x Rib Eye (prueba)\n\x1D\x21\x00\x1B\x45\x00", $bytes);
+                    $this->assertStringContainsString("\x1B\x45\x01DOMICILIO DE ENTREGA:", $bytes);
+                    $this->assertStringContainsString("\x1B\x45\x01Calle de prueba", $bytes);
+                    $this->assertStringContainsString('Termino medio', $bytes);
+                }
+                foreach (explode("\n", $job->payload) as $line) {
+                    $this->assertLessThanOrEqual(32, strlen($line));
+                }
+            }
+        }
+    }
+    public function test_home_delivery_requires_active_driver_and_dispatch_has_no_assignment_form(): void
+    {
+        $driver = \App\Models\DeliveryDriver::create(['name'=>'Repartidor Recepcion', 'is_active'=>false]);
+        $data = array_replace($this->data(), ['delivery_type'=>'domicilio', 'delivery_address'=>'Calle 123', 'scheduled_date'=>now()->toDateString()]);
+        foreach ([null, $driver->id, 999999] as $id) {
+            try {
+                app(OrderService::class)->create(array_replace($data, ['delivery_driver_id'=>$id]));
+                $this->fail('Debe exigir un repartidor activo.');
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                $this->assertArrayHasKey('delivery_driver_id', $e->errors());
+            }
+        }
+        $this->assertSame(0, \App\Models\Order::count());
+        $driver->update(['is_active'=>true]);
+        $order = app(OrderService::class)->create(array_replace($data, ['delivery_driver_id'=>$driver->id]));
+        $this->get('/despacho')->assertOk()->assertSee('Repartidor Recepcion')->assertDontSee('name="delivery_driver_id"', false)->assertDontSee('/pedidos/'.$order->id.'/repartidor');
+
+        auth()->user()->syncRoles(['Cajero']);
+        auth()->user()->unsetRelation('roles')->unsetRelation('permissions');
+        $this->assertFalse(auth()->user()->can('dispatch.manage'));
+        $data['request_key'] = (string) Str::uuid();
+        $order = app(OrderService::class)->create(array_replace($data, ['delivery_driver_id'=>$driver->id]));
+        $this->assertEquals($driver->id, $order->delivery_driver_id);
     }
 }

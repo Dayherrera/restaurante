@@ -62,8 +62,8 @@ class OrderService
             'items' => 'required|array|min:1|max:100', 'items.*.product_id' => 'required|integer', 'items.*.quantity' => 'required|integer|min:1|max:1000',
             'items.*.notes' => 'nullable|string|max:1000', 'items.*.options' => 'array', 'items.*.options.*' => 'integer|min:0|max:1000',
             'payments' => 'array', 'payments.*.method' => 'required|in:efectivo,transferencia,tarjeta', 'payments.*.amount' => 'required|numeric|decimal:0,2|min:0|max:999999',
-            'override' => 'boolean', 'customer_id' => 'nullable|exists:customers,id', 'delivery_driver_id' => 'nullable|exists:delivery_drivers,id', 'items.*.modifiers' => 'array',
-        ])->validate();
+            'override' => 'boolean', 'customer_id' => 'nullable|exists:customers,id', 'delivery_driver_id' => ['nullable', 'required_if:delivery_type,domicilio', 'integer', \Illuminate\Validation\Rule::exists('delivery_drivers', 'id')->where('is_active', true)], 'items.*.modifiers' => 'array',
+        ], ['delivery_driver_id.required_if' => 'Selecciona un repartidor para la entrega a domicilio.', 'delivery_driver_id.exists' => 'Selecciona un repartidor activo.'])->validate();
 
         if (! empty($data['customer_id'])) {
             $customer = Customer::findOrFail($data['customer_id']);
@@ -75,7 +75,6 @@ class OrderService
             $data['delivery_address'] = $customer->address();
         }
         if (! empty($data['delivery_driver_id'])) {
-            Gate::authorize('dispatch.manage');
             if ($data['delivery_type'] !== 'domicilio') {
                 $this->fail('Solo puedes asignar repartidor a entregas a domicilio.');
             }
@@ -145,7 +144,6 @@ class OrderService
                 }
             }
             $this->audit($order, 'created', ['override' => ! empty($data['override'])]);
-            app(TicketService::class)->queue($order, $paid < $total ? 'anticipo' : 'comanda');
 
             return $order;
         }, 3);

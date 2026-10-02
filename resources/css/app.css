@@ -60,3 +60,9 @@ tr.order-unpaid td:first-child { border-left: 4px solid #c2410c; }
  .app-shell>.workspace{margin-left:0;width:100%}.menu-toggle{margin-right:10px}
 }
 @media print{.menu-toggle,.sidebar-backdrop,.sidebar-close{display:none!important}}
+
+.customer-results{max-height:320px;overflow-y:auto}.customer-result.customer-result-active{background:#dfeccd;box-shadow:inset 4px 0 #315d38;outline:2px solid #315d38;outline-offset:-2px}
+
+/* Match customer entry display to the uppercase values stored on save. */
+.pos-customer-entry input,
+.pos-customer-entry textarea { text-transform: uppercase; }

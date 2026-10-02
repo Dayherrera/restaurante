@@ -290,7 +290,7 @@ return Customer::findOrFail($this->customerId);
             app(CustomerService::class)->requireAddress($c);
         }
         $order = app(OrderService::class)->create(['request_key' => $this->request_key, 'customer_id' => $c->id, 'customer_name' => $c->name, 'customer_phone' => $c->phone, 'delivery_type' => $this->delivery_type, 'delivery_address' => $c->address(), 'delivery_cost' => $this->delivery_cost, 'delivery_driver_id' => $this->delivery_driver_id ?: null, 'scheduled_date' => $this->scheduled_date, 'scheduled_time' => $this->scheduled_time, 'items' => $this->items, 'payments' => collect($this->payments)->map(fn ($amount, $method) => ['method' => $method, 'amount' => $amount ?: 0])->values()->all(), 'override' => $this->override]);
-        session()->flash('success', 'Pedido registrado. Comprobante enviado a caja; pendiente de liberación a cocina.');
+        session()->flash('success', 'Pedido registrado. Usa Imprimir comprobantes si necesitas el ticket. Pendiente de liberación a cocina.');
 
         return redirect()->route('orders.show', $order);
     }

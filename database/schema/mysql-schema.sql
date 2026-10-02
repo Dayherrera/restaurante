@@ -15,7 +15,7 @@ CREATE TABLE `audit_logs` (
   KEY `audit_logs_order_id_foreign` (`order_id`),
   CONSTRAINT `audit_logs_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
   CONSTRAINT `audit_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=195 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `cache` (
   `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE `cash_shifts` (
   PRIMARY KEY (`id`),
   KEY `cash_shifts_user_id_status_index` (`user_id`,`status`),
   CONSTRAINT `cash_shifts_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `categories` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -105,7 +105,7 @@ CREATE TABLE `customers` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `customers_phone_unique` (`phone`),
   KEY `customers_name_index` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `delivery_drivers` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -161,7 +161,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `model_has_permissions` (
   `permission_id` bigint unsigned NOT NULL,
@@ -226,7 +226,7 @@ CREATE TABLE `order_items` (
   CONSTRAINT `order_items_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
   CONSTRAINT `order_items_print_area_id_foreign` FOREIGN KEY (`print_area_id`) REFERENCES `print_areas` (`id`),
   CONSTRAINT `order_items_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `order_payments` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -244,7 +244,7 @@ CREATE TABLE `order_payments` (
   KEY `order_payments_cash_shift_id_foreign` (`cash_shift_id`),
   CONSTRAINT `order_payments_cash_shift_id_foreign` FOREIGN KEY (`cash_shift_id`) REFERENCES `cash_shifts` (`id`),
   CONSTRAINT `order_payments_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `order_refunds` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -263,7 +263,7 @@ CREATE TABLE `order_refunds` (
   CONSTRAINT `order_refunds_cash_shift_id_foreign` FOREIGN KEY (`cash_shift_id`) REFERENCES `cash_shifts` (`id`),
   CONSTRAINT `order_refunds_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
   CONSTRAINT `order_refunds_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `order_sequences` (
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -310,7 +310,7 @@ CREATE TABLE `orders` (
   CONSTRAINT `orders_delivery_driver_id_foreign` FOREIGN KEY (`delivery_driver_id`) REFERENCES `delivery_drivers` (`id`),
   CONSTRAINT `orders_production_released_by_foreign` FOREIGN KEY (`production_released_by`) REFERENCES `users` (`id`),
   CONSTRAINT `orders_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `password_reset_tokens` (
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -352,13 +352,14 @@ CREATE TABLE `print_jobs` (
   `printed_at` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `line_styles` json DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `print_jobs_order_id_foreign` (`order_id`),
   KEY `print_jobs_print_area_id_foreign` (`print_area_id`),
   KEY `print_jobs_status_leased_at_index` (`status`,`leased_at`),
   CONSTRAINT `print_jobs_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
   CONSTRAINT `print_jobs_print_area_id_foreign` FOREIGN KEY (`print_area_id`) REFERENCES `print_areas` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=126 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `product_options` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -435,5 +436,5 @@ CREATE TABLE `users` (
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

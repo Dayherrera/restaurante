@@ -143,7 +143,7 @@ class PosController extends Controller
             ->when($view==='overdue',fn($q)=>$q->whereDate('scheduled_date','<',today()))
             ->when($view==='early',fn($q)=>$q->whereDate('scheduled_date','>',today())->whereNotNull('production_released_at'))
             ->orderBy('scheduled_date')->orderBy('scheduled_time')->get();
-        return view('dispatch',compact('orders','view','overdue','early')+['drivers'=>DeliveryDriver::where('is_active',true)->get()]);
+        return view('dispatch',compact('orders','view','overdue','early'));
     }
 
     public function status(Request $r, Order $order)
@@ -218,6 +218,7 @@ class PosController extends Controller
     public function saveProduct(Request $r)
     {
         Gate::authorize('catalog.manage');
+        $r->merge(\App\Support\UppercaseInput::fields($r->all(), ['name', 'description', 'options']));
         $d = $r->validate(['id' => 'nullable|exists:products,id', 'name' => 'required|string|max:150', 'price' => 'required|numeric|decimal:0,2|min:0|max:999999', 'category_id' => 'required|exists:categories,id', 'print_area_id' => 'required|exists:print_areas,id', 'type' => 'required|in:simple,compuesto', 'max_choices' => 'required|integer|min:0|max:100', 'hourly_limit' => 'required|integer|min:0|max:100000', 'daily_limit' => 'required|integer|min:0|max:100000', 'options' => 'nullable|string|max:5000', 'description' => 'nullable|string|max:3000']);
         $options = array_values(array_unique(array_filter(array_map('trim', preg_split('/\R/', $d['options'] ?? '')))));
         if ($d['type'] === 'compuesto' && (! $options || $d['max_choices'] < 1)) {
@@ -249,6 +250,7 @@ class PosController extends Controller
     public function category(Request $r)
     {
         Gate::authorize('catalog.manage');
+        $r->merge(\App\Support\UppercaseInput::fields($r->all(), ['name', 'description', 'options']));
         $d = $r->validate(['name' => 'required|string|max:100|unique:categories,name']);
         Category::create($d);
 
@@ -265,6 +267,7 @@ class PosController extends Controller
     public function saveDriver(Request $r)
     {
         Gate::authorize('dispatch.manage');
+        $r->merge(\App\Support\UppercaseInput::fields($r->all(), ['name', 'description', 'options']));
         $d = $r->validate(['id' => 'nullable|exists:delivery_drivers,id', 'name' => 'required|string|max:100', 'phone' => 'nullable|string|max:25']);
         $id = $d['id'] ?? null;
         unset($d['id']);
@@ -283,6 +286,7 @@ class PosController extends Controller
     public function saveUser(Request $r)
     {
         Gate::authorize('users.manage');
+        $r->merge(\App\Support\UppercaseInput::fields($r->all(), ['name', 'description', 'options']));
         $d = $r->validate(['id' => 'nullable|exists:users,id', 'name' => 'required|string|max:100', 'email' => 'required|email|max:100', 'password' => 'nullable|string|min:10|max:100', 'role' => 'required|exists:roles,name']);
         if (User::where('email', $d['email'])->when($d['id'] ?? null, fn ($q, $id) => $q->where('id', '!=', $id))->exists()) {
             throw ValidationException::withMessages(['email' => 'El correo ya está registrado.']);

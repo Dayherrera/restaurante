@@ -50,6 +50,7 @@ class RealMenuTest extends TestCase
         $order = app(OrderService::class)->create(['request_key' => (string) Str::uuid(), 'customer_name' => 'Prueba', 'customer_phone' => '0000000000', 'delivery_type' => 'sucursal', 'delivery_cost' => 0, 'scheduled_date' => now()->addDay()->toDateString(), 'scheduled_time' => '14:00', 'items' => [['product_id' => $p->id, 'quantity' => 1, 'options' => []]], 'payments' => []]);
         $this->assertEquals(250, $order->total);
         $this->assertStringContainsString('Quesillo', $order->items->first()->product_description);
+        app(\App\Services\TicketService::class)->queue($order, 'reimpresion');
         $this->assertStringNotContainsString('Quesillo', PrintJob::first()->payload);
         $p->update(['description' => 'Descripción cambiada']);
         $this->assertStringContainsString('Quesillo', $order->items()->first()->product_description);

@@ -20,10 +20,10 @@ class ProductionReleaseTest extends TestCase {
  }
  public function test_release_prints_once_and_status_is_blocked_before_release(){
   $order=$this->order();$cash=PrintArea::where('name','Caja')->value('id');
-  $this->assertSame([$cash],PrintJob::pluck('print_area_id')->all());
+  $this->assertSame([],PrintJob::pluck('print_area_id')->all());
   $this->post('/pedidos/'.$order->id.'/estado',['status'=>'en_preparacion'])->assertSessionHasErrors();
   $this->post('/pedidos/'.$order->id.'/liberar')->assertSessionHasNoErrors();
-  $count=PrintJob::count();$this->assertEquals(2,$count);
+  $count=PrintJob::count();$this->assertEquals(1,$count);
   $this->post('/pedidos/'.$order->id.'/liberar')->assertSessionHasNoErrors();$this->assertEquals($count,PrintJob::count());
   $this->assertEquals(1,DB::table('audit_logs')->where('action','production_released')->count());
   $this->post('/pedidos/'.$order->id.'/estado',['status'=>'en_preparacion'])->assertSessionHasNoErrors();

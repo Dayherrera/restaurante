@@ -100,6 +100,7 @@ class Catalog extends Component
     public function createCategory()
     {
         Gate::authorize('catalog.manage');
+        $this->newCategoryName = mb_strtoupper($this->newCategoryName, 'UTF-8');
         $this->validate(['newCategoryName' => 'required|string|max:100|unique:categories,name', 'newCategoryVisible' => 'boolean']);
         $c = Category::create(['name' => $this->newCategoryName, 'visible_in_pos' => $this->newCategoryVisible]);
         $this->form['category_id'] = $c->id;
@@ -112,6 +113,8 @@ class Catalog extends Component
     public function save()
     {
         Gate::authorize('catalog.manage');
+        $this->form = \App\Support\UppercaseInput::fields($this->form, ['name', 'description']);
+        $this->groups = array_map(fn ($group) => \App\Support\UppercaseInput::fields($group, ['name']), $this->groups);
         $this->validate(['form.name' => 'required|string|max:150', 'form.price' => 'required|numeric|decimal:0,2|min:0|max:999999', 'form.category_id' => 'required|exists:categories,id', 'form.print_area_id' => 'required|exists:print_areas,id', 'form.type' => 'required|in:simple,compuesto', 'form.description' => 'nullable|string|max:3000', 'form.hourly_limit' => 'required|integer|min:0|max:100000', 'form.daily_limit' => 'required|integer|min:0|max:100000', 'form.is_active' => 'boolean']);
         if ($this->form['type'] === 'compuesto') {
             $this->validate(['groups' => 'required|array|min:1|max:20', 'groups.*.name' => 'required|string|max:100', 'groups.*.max_choices' => 'required|integer|min:1|max:100', 'groups.*.required' => 'boolean', 'groups.*.option_ids' => 'required|array|min:1|max:100', 'groups.*.option_ids.*' => 'required|integer|exists:products,id']);

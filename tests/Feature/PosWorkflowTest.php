@@ -54,7 +54,7 @@ class PosWorkflowTest extends TestCase
         $this->assertEquals('240.00', $o->total);
         $this->assertEquals('120.00', $o->balance_due);
         $this->assertCount(2, $o->payments);
-        $this->assertEquals(1, PrintJob::count());
+        $this->assertEquals(0, PrintJob::count());
         $this->get('/pedidos/'.$o->id)->assertOk()->assertSee('Sin cebolla');
     }
 
@@ -155,7 +155,9 @@ class PosWorkflowTest extends TestCase
 
     public function test_dispatch_requires_payment_and_driver(): void
     {
-        $o = app(OrderService::class)->create($this->data(['delivery_type' => 'domicilio', 'delivery_address' => 'Calle Uno 25', 'delivery_cost' => 50]));
+        $driver = DeliveryDriver::create(['name' => 'Repartidor prueba', 'is_active' => true]);
+        $o = app(OrderService::class)->create($this->data(['delivery_driver_id' => $driver->id, 'delivery_type' => 'domicilio', 'delivery_address' => 'Calle Uno 25', 'delivery_cost' => 50]));
+        $o->update(['delivery_driver_id' => null]); // Legacy orders may still have no driver.
         $service = app(OrderService::class);
         $service->release($o->id, 'Preparación anticipada de prueba');
         $service->status($o->id, 'en_preparacion');
@@ -224,7 +226,7 @@ class PosWorkflowTest extends TestCase
     {
         $p = Product::where('name', 'Refresco')->first();
         Livewire::test(Pos::class)->set('customerForm.name', 'Cliente Livewire')->set('customerForm.phone', '5555555555')->call('saveCustomer')->set('dateInput', now()->addDay()->toDateString())->set('timeInput', '14:00')->set('delivery_type', 'sucursal')->call('confirmSchedule')->call('add', $p->id)->assertSet('items.0.product_id', $p->id)->set('payments.efectivo', 35)->call('save')->assertHasNoErrors()->assertRedirect();
-        $this->assertDatabaseHas('orders', ['customer_name' => 'Cliente Livewire', 'total' => 35, 'balance_due' => 0]);
+        $this->assertDatabaseHas('orders', ['customer_name' => 'CLIENTE LIVEWIRE', 'total' => 35, 'balance_due' => 0]);
     }
 
     public function test_login_throttling_and_guest_protection(): void

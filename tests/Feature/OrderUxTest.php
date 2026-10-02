@@ -111,7 +111,7 @@ class OrderUxTest extends TestCase
     public function test_catalog_inline_category_preserves_product_and_renders_pages()
     {
         Livewire::test(Catalog::class)->call('create')->set('form.name', 'Producto pendiente')->set('newCategoryName', 'Nueva categoría UX')->call('createCategory')->assertHasNoErrors()->assertSet('form.name', 'Producto pendiente')->call('save')->assertHasNoErrors();
-        $this->assertDatabaseHas('products', ['name' => 'Producto pendiente', 'category_id' => Category::where('name', 'Nueva categoría UX')->value('id')]);
+        $this->assertDatabaseHas('products', ['name' => 'PRODUCTO PENDIENTE', 'category_id' => Category::where('name', 'NUEVA CATEGORÍA UX')->value('id')]);
         foreach (['/catalogo', '/categorias', '/clientes'] as $url) {
             $this->get($url)->assertOk();
         }
@@ -120,7 +120,7 @@ class OrderUxTest extends TestCase
     public function test_search_resets_stale_client_and_only_prefills_phone()
     {
         $c = app(CustomerService::class)->save(array_replace(CustomerService::blank(), ['name' => 'Ana', 'phone' => '9639998888', 'street' => 'Centro']));
-        Livewire::test(Pos::class)->call('selectCustomer', $c->id)->assertSet('customerForm.street', 'Centro')->set('customerSearch', '963 000 1111')->assertSet('customerId', null)->assertSet('customerForm.name', '')->assertSet('customerForm.street', '')->assertSet('customerForm.phone', '9630001111')->assertSet('customerForm.city', 'COMITÁN DE DOMÍNGUEZ');
+        Livewire::test(Pos::class)->call('selectCustomer', $c->id)->assertSet('customerForm.street', 'CENTRO')->set('customerSearch', '963 000 1111')->assertSet('customerId', null)->assertSet('customerForm.name', '')->assertSet('customerForm.street', '')->assertSet('customerForm.phone', '9630001111')->assertSet('customerForm.city', 'COMITÁN DE DOMÍNGUEZ');
     }
 
     public function test_hidden_options_cannot_be_sold_directly()
@@ -134,7 +134,23 @@ class OrderUxTest extends TestCase
     {
         $p = Product::where('name', 'Rib Eye (prueba)')->first();
         Livewire::test(Catalog::class)->call('edit', $p->id)->set('groups.1.max_choices', 1)->call('save')->assertHasNoErrors();
-        $this->assertEquals(1,$p->modifierGroups()->where('name','Guarniciones')->value('max_choices'));
-        $this->assertTrue($p->modifierGroups()->where('name','Término')->first()->required);
+        $this->assertEquals(1,$p->modifierGroups()->where('name','GUARNICIONES')->value('max_choices'));
+        $this->assertTrue($p->modifierGroups()->where('name','TÉRMINO')->first()->required);
+    }
+    public function test_saved_customer_addresses_and_driver_names_use_unicode_uppercase(): void
+    {
+        $data = array_replace(CustomerService::blank(), ['name'=>'José Muñoz', 'phone'=>'9635551234', 'street'=>'avenida niños héroes', 'number'=>'12 b', 'neighborhood'=>'los magueyes', 'city'=>'Comitán', 'state'=>'Chiapas', 'references'=>'frente al árbol']);
+        $customer = app(CustomerService::class)->save($data)->fresh();
+        foreach (['name','street','number','neighborhood','city','state','references'] as $field) {
+            $this->assertSame(mb_strtoupper($data[$field], 'UTF-8'), $customer->$field);
+        }
+        $this->assertSame('9635551234', $customer->phone);
+        $this->post('/repartidores', ['name'=>'Ángel Peña', 'phone'=>'9635550000', 'is_active'=>1])->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('delivery_drivers', ['name'=>'ÁNGEL PEÑA', 'phone'=>'9635550000']);
+        $driver = \App\Models\DeliveryDriver::where('name','ÁNGEL PEÑA')->firstOrFail();
+        $this->post('/repartidores', ['id'=>$driver->id, 'name'=>'Raúl Núñez', 'phone'=>'9635550000', 'is_active'=>1])->assertSessionHasNoErrors();
+        $this->assertSame('RAÚL NÚÑEZ', $driver->fresh()->name);
+        $untouched = ['email'=>'User@Example.com', 'password'=>'MiClaveAbC123', 'website'=>'https://example.com/AbC', 'type'=>'simple'];
+        $this->assertSame($untouched, \App\Support\UppercaseInput::fields($untouched, ['name','description']));
     }
 }

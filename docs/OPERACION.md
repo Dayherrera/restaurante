@@ -110,3 +110,19 @@ Semana y Día ahora usan listas cronológicas: una fila por pedido, hora a la iz
 Ajuste de presentación: Semana usa siete columnas (lunes a domingo) con filas compactas por pedido y sin cuadrícula horaria. Día conserva su lista y muestra la fecha completa en el título.
 
 El botón ☰ de la barra superior permite mostrar u ocultar el menú izquierdo. Punto de venta abre con el menú colapsado. En pantallas pequeñas el menú aparece sobre el contenido y se cierra con ×, Escape o pulsando fuera del panel.
+
+En Nuevo pedido, la búsqueda de clientes permite recorrer los resultados con ↑/↓ y elegir el resaltado con Enter. La lista se cierra al seleccionar o pulsar Escape; al escribir una nueva búsqueda vuelve a mostrarse.
+
+Al confirmar un pedido ya no se genera automáticamente ningún ticket, incluso con anticipo o pago completo inicial. En Ver pedido, el botón Imprimir comprobantes permite imprimir manualmente; conserva las reglas de liberación de cocina. Los abonos posteriores y la liberación manual siguen generando sus comprobantes correspondientes.
+
+### Énfasis en comandas de cocina y barra
+Las nuevas comandas destacan fecha/hora de entrega y productos en negritas y doble altura, conservando 32 columnas para papel de 58 mm. El domicilio se imprime en un bloque en negritas. Los modificadores y notas mantienen tamaño normal. Los comprobantes de caja conservan su diseño. El formato se guarda junto al trabajo de impresión; los trabajos anteriores mantienen su formato original.
+
+
+### Repartidor obligatorio al registrar entregas
+Los pedidos nuevos a domicilio requieren un repartidor activo antes de confirmar. La asignación inicial está disponible para quien registra la venta, incluido Cajero. Los pedidos para recoger en sucursal no requieren repartidor. Cocina y Despacho muestra únicamente el nombre asignado, sin selector ni botón de asignación. Los pedidos existentes se conservan y pueden gestionarse desde el detalle del pedido con los permisos actuales.
+
+
+### Captura en mayúsculas
+Al guardar desde los formularios se convierten a mayúsculas los nombres de clientes, los componentes de su dirección y referencias, nombres y descripciones de productos, categorías, grupos de modificadores y nombres de repartidores y usuarios. Se conservan acentos y Ñ. Correos, contraseñas, enlaces y valores internos no se convierten. Los registros anteriores se normalizan cuando se editan y guardan; no se modifica el historial de pedidos ni los tickets ya generados.
+

@@ -48,6 +48,7 @@ class Categories extends Component
     public function save()
     {
         Gate::authorize('catalog.manage');
+        $this->name = mb_strtoupper($this->name, 'UTF-8');
         $this->validate(['name' => ['required', 'string', 'max:100', Rule::unique('categories', 'name')->ignore($this->categoryId)], 'visible' => 'boolean']);
         $c = $this->categoryId ? Category::findOrFail($this->categoryId) : new Category;
         $c->fill(['name' => $this->name, 'visible_in_pos' => $this->visible])->save();

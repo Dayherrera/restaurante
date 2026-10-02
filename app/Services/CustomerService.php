@@ -33,6 +33,7 @@ class CustomerService
     public function save(array $data, ?int $id = null): Customer
     {
         Gate::authorize('pos.sell');
+        $data = \App\Support\UppercaseInput::fields($data, ['name', 'street', 'number', 'neighborhood', 'city', 'state', 'references']);
         $data['phone'] = self::phone((string) ($data['phone'] ?? ''));
         $data = Validator::make($data, ['name' => 'required|string|max:120', 'phone' => ['required', 'regex:/^[0-9]{7,15}$/', Rule::unique('customers', 'phone')->ignore($id)], 'street' => 'nullable|string|max:150', 'number' => 'nullable|string|max:30', 'neighborhood' => 'nullable|string|max:120', 'city' => 'required|string|max:120', 'state' => 'required|string|max:100', 'references' => 'nullable|string|max:500'], ['phone.unique' => 'Ese teléfono ya está registrado. Busca y selecciona al cliente para actualizar sus datos.', 'phone.regex' => 'Ingresa un teléfono de 7 a 15 dígitos.'])->validate();
         try {

@@ -45,6 +45,14 @@ class TicketService
         return '$'.number_format((float) $value, 2, '.', ',');
     }
 
+    private function emphasize(array &$lines, array &$styles, string $text, string $style): void
+    {
+        foreach ($this->wrap($text) as $line) {
+            $styles[count($lines)] = $style;
+            $lines[] = $line;
+        }
+    }
+
     public function queue(Order $order, string $kind, ?array $itemIds = null): void
     {
         $order->load('items', 'payments');
@@ -57,6 +65,7 @@ class TicketService
         foreach ($areaIds as $areaId) {
             $area = PrintArea::findOrFail($areaId);
             $cash = $area->name === 'Caja';
+            $styles = [];
             $lines = $this->center($cash ? $company->business_name : 'CHAROLAS LOS MAGUEYES');
             if ($cash) {
                 foreach (['legal_name'=>'','rfc'=>'RFC: ','address'=>'','phone'=>'Tel: ','email'=>'','website'=>''] as $field=>$prefix) {
@@ -66,11 +75,18 @@ class TicketService
             $lines = [...$lines, ...$this->center(strtoupper($kind).' / '.$area->name), $rule, ...$this->center('FOLIO: '.$order->order_number)];
             if (!$cash && $order->scheduled_date->toDateString() > now()->toDateString()) $lines = [...$lines, ...$this->center('PREPARACION ANTICIPADA AUTORIZADA')];
             if ($cash) {
-                $lines = [...$lines, ...$this->wrap('Emitido: '.now()->format('d/m/Y H:i'))];
+                $lines = [...$lines, ...$this->wrap('Emitido: '.now()->format('d/m/Y g:i A'))];
             }
-            $lines = [...$lines, ...$this->wrap('Cliente: '.$order->customer_name), ...$this->wrap('Tel: '.$order->customer_phone), ...$this->wrap('Entrega: '.$order->scheduled_date->format('d/m/Y').' '.substr($order->scheduled_time, 0, 5)), ...$this->wrap($order->delivery_type === 'domicilio' ? 'A DOMICILIO' : 'RECOGER EN SUCURSAL')];
-            if ($order->delivery_type === 'domicilio') {
-                $lines = [...$lines, ...$this->wrap($order->delivery_address ?? '')];
+            $time = \Illuminate\Support\Carbon::parse($order->scheduled_time)->format('g:i A');
+            $lines = [...$lines, ...$this->wrap('Cliente: '.$order->customer_name), ...$this->wrap('Tel: '.$order->customer_phone)];
+            if ($cash) {
+                $lines = [...$lines, ...$this->wrap('Entrega: '.$order->scheduled_date->format('d/m/Y').' '.$time), ...$this->wrap($order->delivery_type === 'domicilio' ? 'A DOMICILIO' : 'RECOGER EN SUCURSAL')];
+                if ($order->delivery_type === 'domicilio') $lines = [...$lines, ...$this->wrap($order->delivery_address ?? '')];
+            } else {
+                $lines[] = $rule;
+                $this->emphasize($lines, $styles, 'Entrega: '.$order->scheduled_date->format('d/m/Y').' '.$time, 'large');
+                $this->emphasize($lines, $styles, $order->delivery_type === 'domicilio' ? 'DOMICILIO DE ENTREGA:' : 'RECOGER EN SUCURSAL', 'bold');
+                if ($order->delivery_type === 'domicilio') $this->emphasize($lines, $styles, $order->delivery_address ?? '', 'bold');
             }
             $lines[] = $rule;
             if ($cash) {
@@ -80,7 +96,9 @@ class TicketService
                 if (! $cash && $item->print_area_id != $areaId) {
                     continue;
                 }
-                $lines = [...$lines, ...$this->wrap(($item->is_cancelled ? 'ANULADO: ' : '').$item->quantity.' x '.$item->product_name)];
+                $product = ($item->is_cancelled ? 'ANULADO: ' : '').$item->quantity.' x '.$item->product_name;
+                if ($cash) $lines = [...$lines, ...$this->wrap($product)];
+                else $this->emphasize($lines, $styles, $product, 'large');
                 if ($cash) {
                     $lines = [...$lines, ...$this->columns($item->quantity.' x '.$this->money($item->unit_price), $this->money($item->quantity * $item->unit_price))];
                 }
@@ -106,7 +124,7 @@ class TicketService
                 }
                 $lines = [...$lines, ...$this->columns('PAGADO NETO', $this->money($order->amount_paid)), ...$this->columns('SALDO PENDIENTE', $this->money($order->balance_due)), $rule, ...($company->ticket_footer ? $this->center($company->ticket_footer) : []), ...$this->center('Conserve este comprobante')];
             }
-            PrintJob::create(['order_id' => $order->id, 'print_area_id' => $areaId, 'kind' => $kind, 'payload' => implode("\n",$lines)]);
+            PrintJob::create(['order_id' => $order->id, 'print_area_id' => $areaId, 'kind' => $kind, 'payload' => implode("\n",$lines), 'line_styles' => $styles ?: null]);
         }
     }
 }
