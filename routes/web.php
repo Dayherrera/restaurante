@@ -45,7 +45,7 @@ Route::middleware(['auth', ActiveUser::class])->group(function () {
     Route::get('/usuarios', [C::class, 'users'])->name('users');
     Route::post('/usuarios', [C::class, 'saveUser']);
     Route::post('/roles', [C::class, 'saveRole']);
-    Route::get('/reportes', [C::class, 'reports'])->name('reports');
+    Route::get('/reportes', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports');
     Route::get('/impresion', [C::class, 'printing'])->name('printing');
     Route::post('/impresion/{job}/reintentar', [C::class, 'retry']);
 });

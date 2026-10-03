@@ -324,20 +324,6 @@ class PosController extends Controller
         return back()->with('success', 'Permisos guardados.');
     }
 
-    public function reports(Request $r)
-    {
-        Gate::authorize('reports.view');
-        $r->validate(['from' => 'nullable|date', 'to' => 'nullable|date|after_or_equal:from']);
-        $from = $r->from ?? now()->toDateString();
-        $to = $r->to ?? $from;
-        $orders = Order::whereBetween('created_at', [$from.' 00:00:00', $to.' 23:59:59']);
-        $payments = DB::table('order_payments')->whereBetween('created_at', [$from.' 00:00:00', $to.' 23:59:59'])->selectRaw('payment_method, SUM(amount) as total')->groupBy('payment_method')->get();
-        $refunds = DB::table('order_refunds')->whereBetween('created_at', [$from.' 00:00:00', $to.' 23:59:59'])->selectRaw('payment_method, SUM(amount) as total')->groupBy('payment_method')->get();
-        $production = DB::table('order_items')->join('orders', 'orders.id', '=', 'order_items.order_id')->whereBetween('scheduled_date', [$from, $to])->where('is_cancelled', false)->where('status', '!=', 'cancelado')->selectRaw('scheduled_date, SUBSTR(scheduled_time,1,2) as hour, product_name, SUM(quantity) as units')->groupBy('scheduled_date', 'hour', 'product_name')->orderBy('scheduled_date')->orderBy('hour')->get();
-
-        return view('reports', ['from' => $from, 'to' => $to, 'sales' => (clone $orders)->sum('total'), 'balance' => (clone $orders)->sum('balance_due'), 'count' => (clone $orders)->count(), 'payments' => $payments, 'refunds' => $refunds, 'production' => $production, 'shifts' => CashShift::whereBetween('closed_at', [$from.' 00:00:00', $to.' 23:59:59'])->get()]);
-    }
-
     public function printing()
     {
         Gate::authorize('printing.manage');
